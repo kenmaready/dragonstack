@@ -1,0 +1,62 @@
+body {
+    background-color: black;
+    background-image: url("/dragon-background.7e05814f.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    height: 100vh;
+    color: white;
+}
+
+.card {
+    background: rgba(204, 204, 204, 0.33);
+    width: 50vw;
+}
+
+.info-window {
+    position: fixed;
+    bottom: 20px;
+    right: 40px;
+}
+
+.account-dragons-window {
+    margin-top: 60px;
+}
+
+.dragon-avatar-image-wrapper {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.dragon-avatar-image-pattern {
+    position: absolute;
+    z-index: 20;
+    border-radius: 5%;
+}
+
+.dragon-avatar-image-background {
+    position: absolute;
+    z-index: 10;
+    border-radius: 5%;
+}
+
+.dragon-avatar-image {
+    position: absolute;
+    z-index: 30;
+    border-radius: 5%;
+}
+
+
+.new-dragon-button {
+    margin-top: 12px;
+}
+
+.logout-button {
+    float: right;
+    margin-top: 12px;
+}
+
+
+/*# sourceMappingURL=/src.e31bb0bc.css.map */

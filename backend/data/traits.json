@@ -1,0 +1,18 @@
+[
+    {
+        "type": "backgroundColor",
+        "values": ["green", "yellow", "red", "blue", "white", "black"]
+    },
+    {
+        "type": "pattern",
+        "values": ["solid", "striped", "spotted", "diamond", "flames"]
+    },
+    {
+        "type": "build",
+        "values": ["slender", "athletic", "thicc"]
+    },
+    {
+        "type": "size",
+        "values": ["small", "medium", "large", "giant"]
+    }
+]
