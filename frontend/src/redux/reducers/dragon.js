@@ -2,11 +2,13 @@ import moment from 'moment';
 import { DRAGON } from '../types';
 
 const DEFAULT_DRAGON = {
-    birthdate: moment(),
-    nickname: 'Valerion the Dark Flame',
-    generationId: 1783,
-    dragonId: 3,
-    traits: [{traitType: 'backgroundColor', traitValue: 'black'}, {traitType: 'size', traitValue: 'giant'}, {traitType: 'build', traitValue:'athletic'}, {traitType: 'pattern', traitValue: 'flames'}],
+    birthdate: null,
+    nickname: '',
+    generationId: null,
+    dragonId: null,
+    traits: [],
+    isPublic: false,
+    saleValue: null,
     loading: false,
     message: {}
 };

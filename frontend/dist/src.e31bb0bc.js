@@ -53493,7 +53493,7 @@ var global = arguments[3];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ACCOUNT_DRAGONS = exports.ACCOUNT = exports.DRAGON = exports.GENERATION = void 0;
+exports.PUBLIC_DRAGONS = exports.ACCOUNT_INFO = exports.ACCOUNT_DRAGONS = exports.ACCOUNT = exports.DRAGON = exports.GENERATION = void 0;
 var GENERATION = {
   FETCH: 'GENERATION_FETCH',
   FETCH_ERROR: 'GENERATION_FETCH_ERROR',
@@ -53517,9 +53517,27 @@ exports.ACCOUNT = ACCOUNT;
 var ACCOUNT_DRAGONS = {
   FETCH: 'ACCOUNT_DRAGON_FETCH',
   FETCH_ERROR: 'ACCOUNT_DRAGON_FETCH_ERROR',
-  FETCH_SUCCESS: 'ACCOUNT_DRAGON_FETCH_SUCCESS'
+  FETCH_SUCCESS: 'ACCOUNT_DRAGON_FETCH_SUCCESS',
+  UPDATE: 'ACCOUNT_DRAGON_UPDATE',
+  UPDATE_ERROR: 'ACCOUNT_DRAGON_UPDATE_ERROR',
+  UPDATE_SUCCESS: 'ACCOUNT_DRAGON_UPDATE_SUCCESS'
 };
 exports.ACCOUNT_DRAGONS = ACCOUNT_DRAGONS;
+var ACCOUNT_INFO = {
+  FETCH: 'ACCOUNT_INFO_FETCH',
+  FETCH_ERROR: 'ACCOUNT_INFO_FETCH_ERROR',
+  FETCH_SUCCESS: 'ACCOUNT_INFO_FETCH_SUCCESS'
+};
+exports.ACCOUNT_INFO = ACCOUNT_INFO;
+var PUBLIC_DRAGONS = {
+  FETCH: 'PUBLIC_DRAGON_FETCH',
+  FETCH_ERROR: 'PUBLIC_DRAGON_FETCH_ERROR',
+  FETCH_SUCCESS: 'PUBLIC_DRAGON_FETCH_SUCCESS',
+  BUY: 'DRAGON_BUY',
+  BUY_ERROR: 'DRAGON_BUY_ERROR',
+  BUY_SUCCESS: 'DRAGON_BUY_SUCCESS'
+};
+exports.PUBLIC_DRAGONS = PUBLIC_DRAGONS;
 },{}],"config.js":[function(require,module,exports) {
 "use strict";
 
@@ -53537,7 +53555,7 @@ exports.BACKEND = BACKEND;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.fetchAccountDragons = exports.fetchDragon = exports.fetchGeneration = exports.checkAuthenticated = exports.logout = exports.login = exports.signup = void 0;
+exports.buyDragon = exports.fetchPublicDragons = exports.updateDragon = exports.fetchAccountDragons = exports.fetchDragon = exports.fetchGeneration = exports.checkAuthenticated = exports.fetchAccountInfo = exports.logout = exports.login = exports.signup = void 0;
 
 var _types = require("../types");
 
@@ -53633,6 +53651,18 @@ var logout = function logout() {
 
 exports.logout = logout;
 
+var fetchAccountInfo = function fetchAccountInfo() {
+  return fetchFromAccount({
+    endpoint: 'info',
+    options: {},
+    FETCH_TYPE: _types.ACCOUNT_INFO.FETCH,
+    ERROR_TYPE: _types.ACCOUNT_INFO.FETCH_ERROR,
+    SUCCESS_TYPE: _types.ACCOUNT_INFO.FETCH_SUCCESS
+  });
+};
+
+exports.fetchAccountInfo = fetchAccountInfo;
+
 var checkAuthenticated = function checkAuthenticated() {
   return fetchFromAccount({
     endpoint: 'authenticated',
@@ -53720,6 +53750,115 @@ var fetchAccountDragons = function fetchAccountDragons() {
 };
 
 exports.fetchAccountDragons = fetchAccountDragons;
+
+var updateDragon = function updateDragon(credentials) {
+  return function (dispatch) {
+    dispatch({
+      type: _types.ACCOUNT_DRAGONS.UPDATE
+    });
+    fetch("".concat(_config.BACKEND.baseUrl, "/dragon/update"), {
+      method: 'PUT',
+      body: JSON.stringify(credentials),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    }).then(function (response) {
+      return response.json();
+    }).then(function (json) {
+      if (json.type === 'error') {
+        dispatch({
+          type: _types.ACCOUNT_DRAGONS.UPDATE_ERROR,
+          error: json.message
+        });
+      } else {
+        dispatch({
+          type: _types.ACCOUNT_DRAGONS.UPDATE_SUCCESS,
+          payload: {
+            dragonId: dragonId,
+            nickname: nickname
+          }
+        });
+      }
+    }).catch(function (error) {
+      return dispatch({
+        type: _types.ACCOUNT_DRAGONS.UPDATE_ERROR,
+        error: error.message
+      });
+    });
+  };
+};
+
+exports.updateDragon = updateDragon;
+
+var fetchPublicDragons = function fetchPublicDragons() {
+  return function (dispatch) {
+    dispatch({
+      type: _types.PUBLIC_DRAGONS.FETCH
+    });
+    return fetch("".concat(_config.BACKEND.baseUrl, "/dragon/public-dragons")).then(function (response) {
+      return response.json();
+    }).then(function (json) {
+      if (json.type === 'error') {
+        dispatch({
+          type: _types.PUBLIC_DRAGONS.FETCH_ERROR,
+          error: json.message
+        });
+      } else {
+        dispatch({
+          type: _types.PUBLIC_DRAGONS.FETCH_SUCCESS,
+          payload: json.dragons
+        });
+      }
+    }).catch(function (error) {
+      return dispatch({
+        type: _types.PUBLIC_DRAGONS.FETCH_ERROR,
+        error: error.message
+      });
+    });
+  };
+};
+
+exports.fetchPublicDragons = fetchPublicDragons;
+
+var buyDragon = function buyDragon(credentials) {
+  return function (dispatch) {
+    dispatch({
+      type: _types.PUBLIC_DRAGONS.BUY
+    });
+    return fetch("".concat(_config.BACKEND.baseUrl, "/dragon/buy"), {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    }).then(function (response) {
+      return response.json();
+    }).then(function (json) {
+      if (json.type === 'error') {
+        dispatch({
+          type: _types.PUBLIC_DRAGONS.BUY_ERROR,
+          error: json.message
+        });
+      } else {
+        dispatch({
+          type: _types.PUBLIC_DRAGONS.BUY_SUCCESS,
+          payload: {
+            dragonId: credentials.dragonId
+          }
+        });
+      }
+    }).catch(function (error) {
+      return dispatch({
+        type: _types.PUBLIC_DRAGONS.BUY_ERROR,
+        error: error.message
+      });
+    });
+  };
+};
+
+exports.buyDragon = buyDragon;
 },{"../types":"redux/types.js","../../config":"config.js"}],"components/Generation.js":[function(require,module,exports) {
 "use strict";
 
@@ -53822,7 +53961,7 @@ var Generation = /*#__PURE__*/function (_Component) {
         className: "card-body"
       }, /*#__PURE__*/_react.default.createElement("div", {
         className: "card-text"
-      }, /*#__PURE__*/_react.default.createElement("h4", null, "Currently on Generation\xA0", generation.generationId && generation.generationId, " ..."), /*#__PURE__*/_react.default.createElement("h4", null, "Generation expires\xA0", generation.expiration && generation.expiration.format("h:mm:ss a"), " ..."))));
+      }, /*#__PURE__*/_react.default.createElement("h4", null, "Generation:"), /*#__PURE__*/_react.default.createElement("h5", null, "Currently on Generation\xA0", generation.generationId && generation.generationId, " ..."), /*#__PURE__*/_react.default.createElement("h5", null, "Generation expires\xA0", generation.expiration && generation.expiration.format("h:mm:ss a"), " ..."))));
     }
   }]);
 
@@ -54038,7 +54177,7 @@ var DragonAvatar = /*#__PURE__*/function (_Component) {
             traitValue = _ref.traitValue;
         return traitValue;
       }).join(', ');
-      return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h4", null, "Current Dragon:"), /*#__PURE__*/_react.default.createElement("h5", null, "Name: ", nickname ? nickname : 'Unnamed'), /*#__PURE__*/_react.default.createElement("h5", null, "Dragon Id: ", dragonId), /*#__PURE__*/_react.default.createElement("h5", null, "Generation ", generationId), /*#__PURE__*/_react.default.createElement("h5", null, "Birthdate: ", birthdate.format("MMMM Do, YYYY")), /*#__PURE__*/_react.default.createElement("h5", null, "Description: ", traitString, " "), this.DragonImage);
+      return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("h4", null, "Dragon:"), dragonId ? /*#__PURE__*/_react.default.createElement(_react.Fragment, null, /*#__PURE__*/_react.default.createElement("h4", null, "Current Dragon:"), /*#__PURE__*/_react.default.createElement("h5", null, "Name: ", nickname ? nickname : 'Unnamed'), /*#__PURE__*/_react.default.createElement("h5", null, "Dragon Id: ", dragonId), /*#__PURE__*/_react.default.createElement("h5", null, "Generation: ", generationId), /*#__PURE__*/_react.default.createElement("h5", null, "Birthdate: ", birthdate.format("MMMM Do, YYYY")), /*#__PURE__*/_react.default.createElement("h5", null, "Description: ", traitString, " "), this.DragonImage) : /*#__PURE__*/_react.default.createElement("h5", null, "No Dragon currently selected."));
     }
   }, {
     key: "DragonImage",
@@ -54172,7 +54311,98 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, {
 })(Dragon);
 
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","./DragonAvatar":"components/DragonAvatar.js","../redux/actions":"redux/actions/index.js"}],"components/Home.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","./DragonAvatar":"components/DragonAvatar.js","../redux/actions":"redux/actions/index.js"}],"components/AccountInfo.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.AccountInfo = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _reactRedux = require("react-redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _actions = require("../redux/actions");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var AccountInfo = /*#__PURE__*/function (_Component) {
+  _inherits(AccountInfo, _Component);
+
+  var _super = _createSuper(AccountInfo);
+
+  function AccountInfo() {
+    _classCallCheck(this, AccountInfo);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(AccountInfo, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.fetchAccountInfo();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return /*#__PURE__*/_react.default.createElement("div", {
+        className: "card"
+      }, /*#__PURE__*/_react.default.createElement("div", {
+        className: "card-body"
+      }, /*#__PURE__*/_react.default.createElement("h3", null, "Account:"), /*#__PURE__*/_react.default.createElement("h5", null, "Username: ", this.props.accountInfo.username), /*#__PURE__*/_react.default.createElement("h5", null, "Balance: ", this.props.accountInfo.balance)));
+    }
+  }]);
+
+  return AccountInfo;
+}(_react.Component);
+
+exports.AccountInfo = AccountInfo;
+AccountInfo.proptypes = {
+  AccountInfo: _propTypes.default.object.isRequired,
+  fetchAccountInfo: _propTypes.default.func.isRequired
+};
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    accountInfo: state.accountInfo
+  };
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, {
+  fetchAccountInfo: _actions.fetchAccountInfo
+})(AccountInfo);
+
+exports.default = _default;
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","../redux/actions":"redux/actions/index.js"}],"components/Home.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54191,6 +54421,8 @@ var _reactBootstrap = require("react-bootstrap");
 var _Generation = _interopRequireDefault(require("./Generation"));
 
 var _Dragon = _interopRequireDefault(require("./Dragon"));
+
+var _AccountInfo = _interopRequireDefault(require("./AccountInfo"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54238,7 +54470,7 @@ var Home = /*#__PURE__*/function (_Component) {
         className: "logout-button"
       }), /*#__PURE__*/_react.default.createElement("div", {
         className: "info-window"
-      }, /*#__PURE__*/_react.default.createElement(_Generation.default, null), /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement(_Dragon.default, null)));
+      }, /*#__PURE__*/_react.default.createElement(_AccountInfo.default, null), /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement(_Generation.default, null), /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement(_Dragon.default, null)));
     }
   }]);
 
@@ -54247,7 +54479,7 @@ var Home = /*#__PURE__*/function (_Component) {
 
 var _default = Home;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","react-router-dom":"../node_modules/react-router-dom/esm/react-router-dom.js","prop-types":"../node_modules/prop-types/index.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","./Generation":"components/Generation.js","./Dragon":"components/Dragon.js"}],"components/AuthForm.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-router-dom":"../node_modules/react-router-dom/esm/react-router-dom.js","prop-types":"../node_modules/prop-types/index.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","./Generation":"components/Generation.js","./Dragon":"components/Dragon.js","./AccountInfo":"components/AccountInfo.js"}],"components/AuthForm.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54588,6 +54820,10 @@ var NavBar = /*#__PURE__*/function (_Component) {
           return _history.default.push('/account-dragons');
         }
       }, "My Dragons"), /*#__PURE__*/_react.default.createElement(_reactBootstrap.Nav.Link, {
+        onClick: function onClick() {
+          return _history.default.push('/public-dragons');
+        }
+      }, "Dragons For Sale"), /*#__PURE__*/_react.default.createElement(_reactBootstrap.Nav.Link, {
         onClick: this.handleLogout
       }, "Log out"));
 
@@ -54632,9 +54868,15 @@ exports.default = exports.AccountDragonRow = void 0;
 
 var _react = _interopRequireWildcard(require("react"));
 
+var _reactRedux = require("react-redux");
+
 var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _moment = _interopRequireDefault(require("moment"));
+
+var _reactBootstrap = require("react-bootstrap");
+
+var _actions = require("../redux/actions");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54664,31 +54906,195 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var AccountDragonRow = /*#__PURE__*/function (_Component) {
   _inherits(AccountDragonRow, _Component);
 
   var _super = _createSuper(AccountDragonRow);
 
   function AccountDragonRow() {
+    var _this;
+
     _classCallCheck(this, AccountDragonRow);
 
-    return _super.apply(this, arguments);
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _super.call.apply(_super, [this].concat(args));
+
+    _defineProperty(_assertThisInitialized(_this), "state", {
+      edit: false,
+      editSaleValue: false,
+      onHover: false,
+      nickname: _this.props.dragon.nickname,
+      newName: '',
+      isPublic: _this.props.dragon.isPublic,
+      saleValue: _this.props.dragon.saleValue,
+      newSaleValue: null
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleNameClick", function () {
+      console.log("Dragon ".concat(_this.props.dragon.dragonId, " clicked..."));
+
+      _this.setState({
+        edit: !_this.state.edit,
+        onHover: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleSaleValueClick", function () {
+      _this.setState({
+        editSaleValue: !_this.state.editSaleValue,
+        onHover: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleIsPublicClick", function () {
+      _this.setState({
+        isPublic: !_this.state.isPublic
+      });
+
+      _this.props.updateDragon({
+        dragonId: _this.props.dragon.dragonId,
+        isPublic: !_this.state.isPublic
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleInputAreaClick", function (event) {
+      event.stopPropagation();
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleMouseEnter", function () {
+      console.log("Starting hover on ".concat(_this.props.dragon.dragonId));
+
+      _this.setState({
+        onHover: true
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleMouseLeave", function () {
+      console.log("Finished hover on ".concat(_this.props.dragon.dragonId));
+
+      _this.setState({
+        onHover: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleSubmitName", function (event) {
+      console.log("submitting new name: ", _this.state.newName);
+      event.stopPropagation();
+
+      _this.props.updateDragon({
+        dragonId: _this.props.dragon.dragonId,
+        nickname: _this.state.newName
+      });
+
+      _this.setState({
+        nickname: _this.state.newName,
+        edit: false,
+        onHover: false,
+        newName: ''
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleSubmitSaleValue", function (event) {
+      console.log("submitting new sale value: ", _this.state.newSaleValue);
+      event.stopPropagation();
+
+      _this.props.updateDragon({
+        dragonId: _this.props.dragon.dragonId,
+        saleValue: _this.state.newSaleValue
+      });
+
+      _this.setState({
+        saleValue: _this.state.newSaleValue,
+        editSaleValue: false,
+        onHover: false,
+        newSaleValue: null
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "updateName", function (event) {
+      _this.setState({
+        newName: event.target.value
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "updateSaleValue", function (event) {
+      _this.setState({
+        newSaleValue: event.target.value
+      });
+    });
+
+    return _this;
   }
 
   _createClass(AccountDragonRow, [{
     key: "render",
     value: function render() {
       var _this$props$dragon = this.props.dragon,
-          nickname = _this$props$dragon.nickname,
           birthdate = _this$props$dragon.birthdate,
           traits = _this$props$dragon.traits,
           dragonId = _this$props$dragon.dragonId;
       var renderTraits = traits.map(function (trait, ix) {
         return /*#__PURE__*/_react.default.createElement("span", {
           key: "".concat(dragonId, ".").concat(ix)
-        }, ix === traits.length - 1 ? "".concat(trait.traitValue, ".") : "".concat(trait.traitValue, ", "), " ");
+        }, ix === traits.length - 1 ? "".concat(trait.traitValue, ".") : "".concat(trait.traitValue, ", "));
       });
-      return /*#__PURE__*/_react.default.createElement("div", null, "Dragon ", dragonId, ": ", nickname ? nickname : "unnamed", ", ", (0, _moment.default)(birthdate).format("MMMM Do, YYYY"), ", ", renderTraits);
+
+      var nameEditField = /*#__PURE__*/_react.default.createElement("span", {
+        className: "dragon-row-name-input",
+        onClick: this.handleInputAreaClick
+      }, /*#__PURE__*/_react.default.createElement(_reactBootstrap.InputGroup, {
+        inline: "true",
+        size: "sm",
+        as: "span",
+        className: "mb-3"
+      }, /*#__PURE__*/_react.default.createElement(_reactBootstrap.FormControl, {
+        placeholder: "Dragon's new name",
+        "aria-label": "Dragon's new name",
+        "area-describedby": "basic-addon2",
+        type: "text",
+        value: this.state.newName,
+        onChange: this.updateName
+      }), /*#__PURE__*/_react.default.createElement(_reactBootstrap.InputGroup.Append, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Button, {
+        variant: "outline-secondary",
+        onClick: this.handleSubmitName
+      }, "Save New Name"))));
+
+      var saleValueEditField = /*#__PURE__*/_react.default.createElement("span", {
+        onClick: this.handleInputAreaClick
+      }, /*#__PURE__*/_react.default.createElement(_reactBootstrap.InputGroup, {
+        inline: "true",
+        size: "sm"
+      }, /*#__PURE__*/_react.default.createElement(_reactBootstrap.FormControl, {
+        placeholder: "New value",
+        "aria-label": "New Value",
+        "area-describedby": "basic-addon2",
+        type: "number",
+        value: this.state.newValue,
+        onChange: this.updateSaleValue
+      }), /*#__PURE__*/_react.default.createElement(_reactBootstrap.InputGroup.Append, null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Button, {
+        variant: "outline-secondary",
+        onClick: this.handleSubmitSaleValue
+      }, "Save New Value"))));
+
+      return /*#__PURE__*/_react.default.createElement("div", {
+        className: "dragon-row",
+        onMouseEnter: this.handleMouseEnter,
+        onMouseLeave: this.handleMouseLeave
+      }, "Dragon ", dragonId, ": \xA0", /*#__PURE__*/_react.default.createElement("span", {
+        className: "input-field",
+        onClick: this.handleNameClick
+      }, this.state.nickname ? this.state.nickname : "unnamed", " |\xA0"), "Born ", (0, _moment.default)(birthdate).format("MMMM Do, YYYY"), " |\xA0 Description: ", renderTraits, " |\xA0", /*#__PURE__*/_react.default.createElement("span", {
+        className: "input-field",
+        onClick: this.handleIsPublicClick
+      }, "Public: ", this.state.isPublic ? 'Yes' : 'No', " |\xA0"), /*#__PURE__*/_react.default.createElement("span", {
+        className: "input-field",
+        onClick: this.handleSaleValueClick
+      }, "Value: ", this.state.saleValue, " Crowns"), this.state.edit && nameEditField, this.state.editSaleValue && saleValueEditField);
     }
   }]);
 
@@ -54697,11 +55103,16 @@ var AccountDragonRow = /*#__PURE__*/function (_Component) {
 
 exports.AccountDragonRow = AccountDragonRow;
 AccountDragonRow.proptypes = {
-  dragon: _propTypes.default.object.isRequired
+  dragon: _propTypes.default.object.isRequired,
+  updateDragon: _propTypes.default.func.isRequired
 };
-var _default = AccountDragonRow;
+
+var _default = (0, _reactRedux.connect)(null, {
+  updateDragon: _actions.updateDragon
+})(AccountDragonRow);
+
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","prop-types":"../node_modules/prop-types/index.js","moment":"../node_modules/moment/moment.js"}],"components/AccountDragons.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","moment":"../node_modules/moment/moment.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","../redux/actions":"redux/actions/index.js"}],"components/AccountDragons.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54774,15 +55185,13 @@ var AccountDragons = /*#__PURE__*/function (_Component) {
           dragon: dragon
         }));
       });
-      return /*#__PURE__*/_react.default.createElement("div", {
+      return /*#__PURE__*/_react.default.createElement(_react.Fragment, null, /*#__PURE__*/_react.default.createElement("div", {
+        className: "header-space"
+      }), /*#__PURE__*/_react.default.createElement("div", {
+        className: "container"
+      }, /*#__PURE__*/_react.default.createElement("h2", null, "Your Dragons ..."), /*#__PURE__*/_react.default.createElement("div", {
         className: "account-dragons-window"
-      }, /*#__PURE__*/_react.default.createElement("div", {
-        className: "card"
-      }, /*#__PURE__*/_react.default.createElement("div", {
-        className: "card-body"
-      }, /*#__PURE__*/_react.default.createElement("div", {
-        className: "card-text"
-      }, /*#__PURE__*/_react.default.createElement("h4", null, "Your Dragons ..."), renderDragons))));
+      }, renderDragons)));
     }
   }]);
 
@@ -54806,7 +55215,244 @@ var _default = (0, _reactRedux.connect)(mapStateToProps, {
 })(AccountDragons);
 
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","./AccountDragonRow":"components/AccountDragonRow.js","../redux/actions":"redux/actions/index.js"}],"redux/reducers/account.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","./AccountDragonRow":"components/AccountDragonRow.js","../redux/actions":"redux/actions/index.js"}],"components/PublicDragonRow.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.PublicDragonRow = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _reactRedux = require("react-redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _moment = _interopRequireDefault(require("moment"));
+
+var _reactBootstrap = require("react-bootstrap");
+
+var _actions = require("../redux/actions");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var PublicDragonRow = /*#__PURE__*/function (_Component) {
+  _inherits(PublicDragonRow, _Component);
+
+  var _super = _createSuper(PublicDragonRow);
+
+  function PublicDragonRow() {
+    var _this;
+
+    _classCallCheck(this, PublicDragonRow);
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    _this = _super.call.apply(_super, [this].concat(args));
+
+    _defineProperty(_assertThisInitialized(_this), "state", {
+      onHover: false
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleBuy", function () {
+      _this.props.buyDragon({
+        dragonId: _this.props.dragon.dragonId,
+        saleValue: _this.props.dragon.saleValue
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleMouseEnter", function () {
+      _this.setState({
+        onHover: true
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleMouseLeave", function () {
+      _this.setState({
+        onHover: false
+      });
+    });
+
+    return _this;
+  }
+
+  _createClass(PublicDragonRow, [{
+    key: "render",
+    value: function render() {
+      var _this$props$dragon = this.props.dragon,
+          nickname = _this$props$dragon.nickname,
+          birthdate = _this$props$dragon.birthdate,
+          traits = _this$props$dragon.traits,
+          saleValue = _this$props$dragon.saleValue,
+          dragonId = _this$props$dragon.dragonId,
+          isPublic = _this$props$dragon.isPublic;
+      var renderTraits = traits.map(function (trait, ix) {
+        return /*#__PURE__*/_react.default.createElement("span", {
+          key: "".concat(dragonId, ".").concat(ix)
+        }, ix === traits.length - 1 ? "".concat(trait.traitValue, ".") : "".concat(trait.traitValue, ", "));
+      });
+      return /*#__PURE__*/_react.default.createElement("div", null, isPublic && /*#__PURE__*/_react.default.createElement("div", {
+        className: "dragon-row",
+        onMouseEnter: this.handleMouseEnter,
+        onMouseLeave: this.handleMouseLeave
+      }, "Dragon ", dragonId, ": \xA0", nickname ? nickname : "Unnamed Dragon", " |\xA0 Born ", (0, _moment.default)(birthdate).format("MMMM Do, YYYY"), " |\xA0 Description: ", renderTraits, " |\xA0 Price: ", saleValue, " Crowns", this.state.onHover && /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_reactBootstrap.Button, {
+        size: "sm",
+        variant: "primary",
+        className: "buy-button",
+        onClick: this.handleBuy
+      }, "Buy"))));
+    }
+  }]);
+
+  return PublicDragonRow;
+}(_react.Component);
+
+exports.PublicDragonRow = PublicDragonRow;
+PublicDragonRow.proptypes = {
+  dragon: _propTypes.default.object.isRequired,
+  buyDragon: _propTypes.default.func.isRequired
+};
+
+var _default = (0, _reactRedux.connect)(null, {
+  buyDragon: _actions.buyDragon
+})(PublicDragonRow);
+
+exports.default = _default;
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","moment":"../node_modules/moment/moment.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","../redux/actions":"redux/actions/index.js"}],"components/PublicDragons.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.PublicDragons = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _reactRedux = require("react-redux");
+
+var _propTypes = _interopRequireDefault(require("prop-types"));
+
+var _PublicDragonRow = _interopRequireDefault(require("./PublicDragonRow"));
+
+var _actions = require("../redux/actions");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var PublicDragons = /*#__PURE__*/function (_Component) {
+  _inherits(PublicDragons, _Component);
+
+  var _super = _createSuper(PublicDragons);
+
+  function PublicDragons() {
+    _classCallCheck(this, PublicDragons);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(PublicDragons, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.fetchPublicDragons();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var dragons = this.props.dragons;
+      var renderDragons = dragons.length > 0 ? dragons.map(function (dragon) {
+        return /*#__PURE__*/_react.default.createElement("div", {
+          key: dragon.dragonId
+        }, /*#__PURE__*/_react.default.createElement(_PublicDragonRow.default, {
+          dragon: dragon
+        }));
+      }) : /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("hr", null), /*#__PURE__*/_react.default.createElement("h4", null, " No dragons currently available"), /*#__PURE__*/_react.default.createElement("hr", null));
+      return /*#__PURE__*/_react.default.createElement(_react.Fragment, null, /*#__PURE__*/_react.default.createElement("div", {
+        className: "header-space"
+      }), /*#__PURE__*/_react.default.createElement("div", {
+        className: "container"
+      }, /*#__PURE__*/_react.default.createElement("h2", null, "Available Dragons ..."), /*#__PURE__*/_react.default.createElement("div", {
+        className: "account-dragons-window"
+      }, renderDragons)));
+    }
+  }]);
+
+  return PublicDragons;
+}(_react.Component);
+
+exports.PublicDragons = PublicDragons;
+PublicDragons.proptypes = {
+  dragons: _propTypes.default.array.isRequired,
+  fetchPublicDragons: _propTypes.default.func.isRequired
+};
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    dragons: state.publicDragons.dragons
+  };
+};
+
+var _default = (0, _reactRedux.connect)(mapStateToProps, {
+  fetchPublicDragons: _actions.fetchPublicDragons
+})(PublicDragons);
+
+exports.default = _default;
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","prop-types":"../node_modules/prop-types/index.js","./PublicDragonRow":"components/PublicDragonRow.js","../redux/actions":"redux/actions/index.js"}],"redux/reducers/account.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54880,6 +55526,58 @@ var account = function account() {
 
 var _default = account;
 exports.default = _default;
+},{"../types":"redux/types.js"}],"redux/reducers/accountInfo.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _types = require("../types");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var DEFAULT_STATE = {
+  loading: false,
+  message: '',
+  error: ''
+};
+
+var accountInfo = function accountInfo() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_STATE;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case _types.ACCOUNT_INFO.FETCH:
+      return _objectSpread({}, state, {
+        loading: true,
+        error: ''
+      });
+
+    case _types.ACCOUNT_INFO.FETCH_ERROR:
+      return _objectSpread({}, state, {
+        loading: false,
+        error: action.error
+      });
+
+    case _types.ACCOUNT_INFO.FETCH_SUCCESS:
+      return _objectSpread({}, state, {}, action.payload.info, {
+        loading: false,
+        error: ''
+      });
+
+    default:
+      return state;
+  }
+};
+
+var _default = accountInfo;
+exports.default = _default;
 },{"../types":"redux/types.js"}],"redux/reducers/accountDragons.js":[function(require,module,exports) {
 "use strict";
 
@@ -54908,12 +55606,14 @@ var accountDragonReducer = function accountDragonReducer() {
 
   switch (action.type) {
     case _types.ACCOUNT_DRAGONS.FETCH:
+    case _types.ACCOUNT_DRAGONS.UPDATE:
       return _objectSpread({}, state, {
         loading: true,
         error: ''
       });
 
     case _types.ACCOUNT_DRAGONS.FETCH_ERROR:
+    case _types.ACCOUNT_DRAGONS.UPDATE_ERROR:
       return _objectSpread({}, state, {
         loading: false,
         error: action.error
@@ -54924,6 +55624,12 @@ var accountDragonReducer = function accountDragonReducer() {
         loading: false,
         error: '',
         dragons: action.payload.dragons
+      });
+
+    case _types.ACCOUNT_DRAGONS.UPDATE_SUCCESS:
+      return _objectSpread({}, state, {
+        loading: false,
+        error: ''
       });
 
     default:
@@ -54954,23 +55660,13 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var DEFAULT_DRAGON = {
-  birthdate: (0, _moment.default)(),
-  nickname: 'Valerion the Dark Flame',
-  generationId: 1783,
-  dragonId: 3,
-  traits: [{
-    traitType: 'backgroundColor',
-    traitValue: 'black'
-  }, {
-    traitType: 'size',
-    traitValue: 'giant'
-  }, {
-    traitType: 'build',
-    traitValue: 'athletic'
-  }, {
-    traitType: 'pattern',
-    traitValue: 'flames'
-  }],
+  birthdate: null,
+  nickname: '',
+  generationId: null,
+  dragonId: null,
+  traits: [],
+  isPublic: false,
+  saleValue: null,
   loading: false,
   message: {}
 };
@@ -55063,7 +55759,74 @@ var generationReducer = function generationReducer() {
 
 var _default = generationReducer;
 exports.default = _default;
-},{"moment":"../node_modules/moment/moment.js","../types":"redux/types.js"}],"redux/reducers/index.js":[function(require,module,exports) {
+},{"moment":"../node_modules/moment/moment.js","../types":"redux/types.js"}],"redux/reducers/publicDragons.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _types = require("../types");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var DEFAULT_STATE = {
+  dragons: [],
+  loading: false,
+  error: ''
+};
+
+var publicDragons = function publicDragons() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_STATE;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case _types.PUBLIC_DRAGONS.FETCH:
+    case _types.PUBLIC_DRAGONS.BUY:
+      return _objectSpread({}, state, {
+        loading: true,
+        error: ''
+      });
+
+    case _types.PUBLIC_DRAGONS.FETCH_ERROR:
+    case _types.PUBLIC_DRAGONS.BUY_ERROR:
+      return _objectSpread({}, state, {
+        loading: false,
+        error: action.error
+      });
+
+    case _types.PUBLIC_DRAGONS.FETCH_SUCCESS:
+      return _objectSpread({}, state, {
+        dragons: action.payload,
+        loading: false,
+        error: ''
+      });
+
+    case _types.PUBLIC_DRAGONS.BUY_SUCCESS:
+      var dragonIndex = state.dragons.findIndex(function (dragon) {
+        return dragon.dragonId === action.payload.dragonId;
+      });
+      var newDragons = Array.from(state.dragons);
+      newDragons.splice(dragonIndex, 1);
+      return _objectSpread({}, state, {
+        dragons: newDragons,
+        loading: false,
+        error: ''
+      });
+
+    default:
+      return state;
+  }
+};
+
+var _default = publicDragons;
+exports.default = _default;
+},{"../types":"redux/types.js"}],"redux/reducers/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -55075,23 +55838,29 @@ var _redux = require("redux");
 
 var _account = _interopRequireDefault(require("./account"));
 
+var _accountInfo = _interopRequireDefault(require("./accountInfo"));
+
 var _accountDragons = _interopRequireDefault(require("./accountDragons"));
 
 var _dragon = _interopRequireDefault(require("./dragon"));
 
 var _generation = _interopRequireDefault(require("./generation"));
 
+var _publicDragons = _interopRequireDefault(require("./publicDragons"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _default = (0, _redux.combineReducers)({
   account: _account.default,
   accountDragons: _accountDragons.default,
+  accountInfo: _accountInfo.default,
   dragon: _dragon.default,
-  generation: _generation.default
+  generation: _generation.default,
+  publicDragons: _publicDragons.default
 });
 
 exports.default = _default;
-},{"redux":"../../../../node_modules/redux/es/redux.js","./account":"redux/reducers/account.js","./accountDragons":"redux/reducers/accountDragons.js","./dragon":"redux/reducers/dragon.js","./generation":"redux/reducers/generation.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"redux":"../../../../node_modules/redux/es/redux.js","./account":"redux/reducers/account.js","./accountInfo":"redux/reducers/accountInfo.js","./accountDragons":"redux/reducers/accountDragons.js","./dragon":"redux/reducers/dragon.js","./generation":"redux/reducers/generation.js","./publicDragons":"redux/reducers/publicDragons.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -55186,6 +55955,8 @@ var _NavBar = _interopRequireDefault(require("./components/NavBar"));
 
 var _AccountDragons = _interopRequireDefault(require("./components/AccountDragons"));
 
+var _PublicDragons = _interopRequireDefault(require("./components/PublicDragons"));
+
 var _reducers = _interopRequireDefault(require("./redux/reducers"));
 
 var _actions = require("./redux/actions");
@@ -55229,9 +56000,12 @@ store.dispatch((0, _actions.checkAuthenticated)()).then(function () {
   }), /*#__PURE__*/_react.default.createElement(AuthRoute, {
     path: "/account-dragons",
     component: _AccountDragons.default
+  }), /*#__PURE__*/_react.default.createElement(AuthRoute, {
+    path: "/public-dragons",
+    component: _PublicDragons.default
   }))))), document.getElementById('root'));
 });
-},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","redux":"../../../../node_modules/redux/es/redux.js","react-redux":"../node_modules/react-redux/es/index.js","redux-thunk":"../../../../node_modules/redux-thunk/es/index.js","./history":"history.js","react-router-dom":"../node_modules/react-router-dom/esm/react-router-dom.js","./components/Root":"components/Root.js","./components/NavBar":"components/NavBar.js","./components/AccountDragons":"components/AccountDragons.js","./redux/reducers":"redux/reducers/index.js","./redux/actions":"redux/actions/index.js","./css/main.css":"css/main.css"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","redux":"../../../../node_modules/redux/es/redux.js","react-redux":"../node_modules/react-redux/es/index.js","redux-thunk":"../../../../node_modules/redux-thunk/es/index.js","./history":"history.js","react-router-dom":"../node_modules/react-router-dom/esm/react-router-dom.js","./components/Root":"components/Root.js","./components/NavBar":"components/NavBar.js","./components/AccountDragons":"components/AccountDragons.js","./components/PublicDragons":"components/PublicDragons.js","./redux/reducers":"redux/reducers/index.js","./redux/actions":"redux/actions/index.js","./css/main.css":"css/main.css"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -55259,7 +56033,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54099" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51242" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

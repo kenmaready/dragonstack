@@ -9,6 +9,7 @@ import { Router, Switch, Route, Redirect } from 'react-router-dom';
 import Root from './components/Root';
 import NavBar from './components/NavBar';
 import AccountDragons from './components/AccountDragons';
+import PublicDragons from './components/PublicDragons';
 import reducers from './redux/reducers';
 import { checkAuthenticated } from './redux/actions';
 import './css/main.css';
@@ -40,6 +41,7 @@ store.dispatch(checkAuthenticated())
                         <Switch>
                             <Route exact path='/' component={Root} />
                             <AuthRoute path='/account-dragons' component={AccountDragons} />
+                            <AuthRoute path='/public-dragons' component={PublicDragons} />
                         </Switch>
                     </Router>
                 </div>

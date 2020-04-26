@@ -16,8 +16,9 @@ export class NavBar extends Component {
     render() {
         const showNavLinks = (
             <Fragment>
-                <Nav.Link onClick={() => history.push('/')}>Home</Nav.Link>
-                <Nav.Link onClick={() => history.push('/account-dragons')}>My Dragons</Nav.Link>
+                <Nav.Link onClick={() => history.push('/')}>Home</Nav.Link>   
+                <Nav.Link onClick={() => history.push('/account-dragons')}>My Dragons</Nav.Link>  
+                <Nav.Link onClick={() => history.push('/public-dragons')}>Dragons For Sale</Nav.Link>  
                 <Nav.Link onClick={this.handleLogout}>Log out</Nav.Link>
             </Fragment>
         );

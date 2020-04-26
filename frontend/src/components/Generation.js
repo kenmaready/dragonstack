@@ -34,11 +34,12 @@ class Generation extends Component {
             <div className='card'>
                 <div className='card-body'>
                     <div className='card-text'>
-                        <h4>Currently on Generation&nbsp; 
+                        <h4>Generation:</h4>
+                        <h5>Currently on Generation&nbsp; 
                             {generation.generationId && 
-                            generation.generationId} ...</h4>
-                        <h4>Generation expires&nbsp; 
-                        {generation.expiration && generation.expiration.format("h:mm:ss a")} ...</h4>
+                            generation.generationId} ...</h5>
+                        <h5>Generation expires&nbsp; 
+                        {generation.expiration && generation.expiration.format("h:mm:ss a")} ...</h5>
                     </div>
                 </div>
             </div>

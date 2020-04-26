@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import { slender, athletic, thicc, solid, striped, spotted, diamond, flames} from '../assets';
@@ -42,13 +42,20 @@ class DragonAvatar extends Component {
 
         return (
             <div>
-                <h4>Current Dragon:</h4>
-                <h5>Name: {nickname ? nickname : 'Unnamed'}</h5>
-                <h5>Dragon Id: {dragonId}</h5>
-                <h5>Generation {generationId}</h5>
-                <h5>Birthdate: {birthdate.format("MMMM Do, YYYY")}</h5>
-                <h5>Description: {traitString} </h5>
-                { this.DragonImage }
+                <h4>Dragon:</h4>
+                {dragonId ? (
+                <Fragment>
+                    <h4>Current Dragon:</h4>
+                    <h5>Name: {nickname ? nickname : 'Unnamed'}</h5>
+                    <h5>Dragon Id: {dragonId}</h5>
+                    <h5>Generation: {generationId}</h5>
+                    <h5>Birthdate: {birthdate.format("MMMM Do, YYYY")}</h5>
+                    <h5>Description: {traitString} </h5>
+                    { this.DragonImage }
+                </Fragment>
+                ) : (
+                    <h5>No Dragon currently selected.</h5>
+                )}
             </div>
         )
     }

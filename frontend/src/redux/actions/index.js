@@ -1,4 +1,9 @@
-import { GENERATION, DRAGON, ACCOUNT, ACCOUNT_DRAGONS } from '../types';
+import { GENERATION,
+    DRAGON,
+    ACCOUNT,
+    ACCOUNT_DRAGONS,
+    ACCOUNT_INFO,
+    PUBLIC_DRAGONS } from '../types';
 import { BACKEND } from '../../config';
 
 
@@ -64,6 +69,16 @@ export const logout = () => {
         ERROR_TYPE: ACCOUNT.FETCH_ERROR,
         SUCCESS_TYPE: ACCOUNT.FETCH_LOGOUT_SUCCESS
     });
+}
+
+export const fetchAccountInfo = () => {
+    return fetchFromAccount({
+        endpoint: 'info',
+        options: {},
+        FETCH_TYPE: ACCOUNT_INFO.FETCH,
+        ERROR_TYPE: ACCOUNT_INFO.FETCH_ERROR,
+        SUCCESS_TYPE: ACCOUNT_INFO.FETCH_SUCCESS
+    })
 }
 
 export const checkAuthenticated = () => {
@@ -134,6 +149,91 @@ export const fetchAccountDragons = () => {
         SUCCESS_TYPE: ACCOUNT_DRAGONS.FETCH_SUCCESS
     })
 }
+
+export const updateDragon = (credentials) => dispatch => {
+    dispatch({ type: ACCOUNT_DRAGONS.UPDATE });
+    fetch(`${BACKEND.baseUrl}/dragon/update`,
+        { 
+        method: 'PUT',
+        body: JSON.stringify(credentials),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(json => {
+        if (json.type === 'error') {
+            dispatch({
+                type: ACCOUNT_DRAGONS.UPDATE_ERROR,
+                error: json.message
+            });
+        } else {
+            dispatch({
+                type: ACCOUNT_DRAGONS.UPDATE_SUCCESS,
+                payload: { dragonId, nickname }
+            });
+        }
+    })
+    .catch(error => dispatch({
+        type: ACCOUNT_DRAGONS.UPDATE_ERROR,
+        error: error.message
+        })
+    );
+}
+
+export const fetchPublicDragons = () => dispatch => {
+    dispatch({ type: PUBLIC_DRAGONS.FETCH });
+
+    return fetch(`${BACKEND.baseUrl}/dragon/public-dragons`)
+    .then(response => response.json())
+    .then(json => {
+        if (json.type === 'error') {
+            dispatch({
+                type: PUBLIC_DRAGONS.FETCH_ERROR,
+                error: json.message
+            });
+        } else {
+            dispatch({
+                type: PUBLIC_DRAGONS.FETCH_SUCCESS,
+                payload: json.dragons
+            });
+        }
+    })
+    .catch(error => dispatch({
+        type: PUBLIC_DRAGONS.FETCH_ERROR,
+        error: error.message
+    })
+    );
+}
+
+export const buyDragon = (credentials) => dispatch => {
+    dispatch({ type: PUBLIC_DRAGONS.BUY });
+    return fetch(`${BACKEND.baseUrl}/dragon/buy`,
+    {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'   
+    })
+    .then(response => response.json())
+    .then(json => {
+        if (json.type === 'error') {
+            dispatch({
+                type: PUBLIC_DRAGONS.BUY_ERROR,
+                error: json.message
+            });
+        } else {
+            dispatch({ 
+                type: PUBLIC_DRAGONS.BUY_SUCCESS,
+                payload:  { dragonId: credentials.dragonId }
+            });
+        }
+    })
+    .catch(error => dispatch({
+        type: PUBLIC_DRAGONS.BUY_ERROR,
+        error: error.message
+    })
+    );
+} 
 
 
 

@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 
+
 import Generation from './Generation';
 import Dragon from './Dragon';
-
+import AccountInfo from './AccountInfo';
 
 class Home extends Component {
     render () {
@@ -14,6 +15,8 @@ class Home extends Component {
                 <div className='logout-button'>
                 </div>
                 <div className="info-window">
+                    <AccountInfo />
+                    <hr />
                     <Generation />
                     <hr />
                     <Dragon />

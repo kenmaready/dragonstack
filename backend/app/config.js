@@ -5,6 +5,8 @@ const DAYS = HOURS * 24;
 
 const REFRESH_RATE = 5; // units of ____
 
+const STARTING_BALANCE = 50;
+
 module.exports = {
-    SECONDS, MINUTES, HOURS, DAYS, REFRESH_RATE
+    SECONDS, MINUTES, HOURS, DAYS, REFRESH_RATE, STARTING_BALANCE
 };

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -22,16 +22,15 @@ export class AccountDragons extends Component {
         });
         
         return (
-            <div className='account-dragons-window'>
-                <div className='card'>
-                    <div className='card-body'>
-                        <div className='card-text'>
-                            <h4>Your Dragons ...</h4>
+            <Fragment>
+            <div className="header-space" />
+            <div className="container">
+                <h2>Your Dragons ...</h2>
+                <div className='account-dragons-window'>
                             {renderDragons}
-                        </div>
-                    </div>
-                </div>
+                </div> 
             </div>
+            </Fragment>
         )
     }
 }
