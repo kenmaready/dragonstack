@@ -5,6 +5,7 @@ import { GENERATION,
     ACCOUNT_INFO,
     PUBLIC_DRAGONS } from '../types';
 import { BACKEND } from '../../config';
+import history from '../../history';
 
 
 // private helper function for signup, login, logout and others
@@ -183,7 +184,9 @@ export const updateDragon = (credentials) => dispatch => {
 export const fetchPublicDragons = () => dispatch => {
     dispatch({ type: PUBLIC_DRAGONS.FETCH });
 
-    return fetch(`${BACKEND.baseUrl}/dragon/public-dragons`)
+    return fetch(`${BACKEND.baseUrl}/dragon/public-dragons`, 
+        { credentials: 'include' }
+        )
     .then(response => response.json())
     .then(json => {
         if (json.type === 'error') {
@@ -208,32 +211,63 @@ export const fetchPublicDragons = () => dispatch => {
 export const buyDragon = (credentials) => dispatch => {
     dispatch({ type: PUBLIC_DRAGONS.BUY });
     return fetch(`${BACKEND.baseUrl}/dragon/buy`,
-    {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'   
-    })
-    .then(response => response.json())
-    .then(json => {
-        if (json.type === 'error') {
-            dispatch({
-                type: PUBLIC_DRAGONS.BUY_ERROR,
-                error: json.message
-            });
-        } else {
-            dispatch({ 
-                type: PUBLIC_DRAGONS.BUY_SUCCESS,
-                payload:  { dragonId: credentials.dragonId }
-            });
-        }
-    })
-    .catch(error => dispatch({
-        type: PUBLIC_DRAGONS.BUY_ERROR,
-        error: error.message
-    })
+        {
+            method: 'POST',
+            body: JSON.stringify(credentials),
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'   
+        })
+        .then(response => response.json())
+        .then(json => {
+            if (json.type === 'error') {
+                dispatch({
+                    type: PUBLIC_DRAGONS.BUY_ERROR,
+                    error: json.message
+                });
+            } else {
+                dispatch({ 
+                    type: PUBLIC_DRAGONS.BUY_SUCCESS,
+                    payload:  { dragonId: credentials.dragonId }
+                });
+            }
+        })
+        .catch(error => dispatch({
+            type: PUBLIC_DRAGONS.BUY_ERROR,
+            error: error.message
+        })
     );
 } 
+
+export const mateDragons = (credentials) => dispatch => {
+    dispatch({ type: ACCOUNT_DRAGONS.MATE });
+    return fetch(`${BACKEND.baseUrl}/dragon/mate`,
+        {
+            method: 'POST',
+            body: JSON.stringify(credentials),
+            headers: { 'Content-Type': 'application/json'},
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(json => {
+            if (json.type === 'error') {
+                dispatch({
+                    type: ACCOUNT_DRAGONS.MATE_ERROR,
+                    error: json.message
+                });
+            } else {
+                dispatch({
+                    type: ACCOUNT_DRAGONS.MATE_SUCCESS,
+                    payload: json.message
+                });
+                history.push('/account-dragons');
+            }
+        })
+        .catch(error => dispatch({
+            type: ACCOUNT_DRAGONS.MATE_ERROR,
+            error: error.message
+        })
+    );
+}
 
 
 

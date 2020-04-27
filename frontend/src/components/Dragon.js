@@ -7,6 +7,14 @@ import DragonAvatar from './DragonAvatar';
 import { fetchDragon } from '../redux/actions';
 
 class Dragon extends Component {
+    get DragonView() {
+        const { dragon } = this.props;
+        if (dragon.error) {
+            return <h5>{dragon.error}</h5>
+        } else {
+            return <DragonAvatar dragon={dragon}/>
+        }
+    }
 
     render() {
         const { dragon } = this.props;
@@ -14,7 +22,7 @@ class Dragon extends Component {
         return (
             <div className='card'>
                 <div className='card-body'>     
-                    <DragonAvatar dragon={dragon}/>
+                    { this.DragonView }
                     <br />
                     <Button className="new-dragon-button" onClick={this.props.fetchDragon}>Get New Dragon</Button>
                 </div> 

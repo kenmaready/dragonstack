@@ -9,14 +9,13 @@ import Dragon from './Dragon';
 import AccountInfo from './AccountInfo';
 
 class Home extends Component {
+    
     render () {
         return (
             <Fragment>
                 <div className='logout-button'>
                 </div>
                 <div className="info-window">
-                    <AccountInfo />
-                    <hr />
                     <Generation />
                     <hr />
                     <Dragon />

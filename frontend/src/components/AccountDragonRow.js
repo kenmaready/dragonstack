@@ -10,21 +10,27 @@ export class AccountDragonRow extends Component {
     state = {
             edit: false,
             editSaleValue: false,
+            editSireValue: false,
             onHover: false,
             nickname: this.props.dragon.nickname,
             newName: '',
             isPublic: this.props.dragon.isPublic,
             saleValue: this.props.dragon.saleValue,
-            newSaleValue: null
+            newSaleValue: '',
+            sireValue: this.props.dragon.sireValue,
+            newSireValue: ''
     }
     
     handleNameClick = () => {
-        console.log(`Dragon ${this.props.dragon.dragonId} clicked...`);
         this.setState({ edit: !this.state.edit, onHover: false });
     }
 
     handleSaleValueClick = () => {
         this.setState({ editSaleValue: !this.state.editSaleValue, onHover: false });
+    }
+
+    handleSireValueClick = () => {
+        this.setState({ editSireValue: !this.state.editSireValue, onHover: false });
     }
 
     handleIsPublicClick = () => {
@@ -37,27 +43,29 @@ export class AccountDragonRow extends Component {
     }
     
     handleMouseEnter = () => {
-        console.log(`Starting hover on ${this.props.dragon.dragonId}`);
         this.setState({ onHover: true });
     }
 
     handleMouseLeave = () => {
-        console.log(`Finished hover on ${this.props.dragon.dragonId}`)
         this.setState({ onHover: false });
     }
     
     handleSubmitName = (event) => {
-        console.log("submitting new name: ", this.state.newName);
         event.stopPropagation();
         this.props.updateDragon({ dragonId: this.props.dragon.dragonId, nickname: this.state.newName });
         this.setState({ nickname: this.state.newName, edit: false, onHover: false, newName: '' });
     }
 
     handleSubmitSaleValue = (event) => {
-        console.log("submitting new sale value: ", this.state.newSaleValue);
         event.stopPropagation();
         this.props.updateDragon({ dragonId: this.props.dragon.dragonId, saleValue: this.state.newSaleValue });
-        this.setState({ saleValue: this.state.newSaleValue, editSaleValue: false, onHover: false, newSaleValue: null });
+        this.setState({ saleValue: this.state.newSaleValue, editSaleValue: false, onHover: false, newSaleValue: '' });
+    }
+
+    handleSubmitSireValue = (event) => {
+        event.stopPropagation();
+        this.props.updateDragon({ dragonId: this.props.dragon.dragonId, sireValue: this.state.newSireValue });
+        this.setState({ sireValue: this.state.newSireValue, editSireValue: false, onHover: false, newSireValue: '' });
     }
 
     updateName = event => {
@@ -66,6 +74,10 @@ export class AccountDragonRow extends Component {
 
     updateSaleValue = event => {
         this.setState({ newSaleValue: event.target.value });
+    }
+
+    updateSireValue = event => {
+        this.setState({ newSireValue: event.target.value });
     }
 
     render() {
@@ -98,17 +110,37 @@ export class AccountDragonRow extends Component {
 
         const saleValueEditField = (
             <span onClick={this.handleInputAreaClick}>
-                <InputGroup inline="true" size="sm">
+                <InputGroup inline="true" size="sm" as="span">
                     <FormControl
-                        placeholder="New value"
-                        aria-label="New Value"
+                        placeholder="New Sale Value"
+                        aria-label="New Sale Value"
                         area-describedby="basic-addon2"
                         type='number'
-                        value={this.state.newValue}
+                        value={this.state.newSaleValue}
                         onChange={this.updateSaleValue}
+                        className="input-sm"
                     />
                     <InputGroup.Append>
-                        <Button variant='outline-secondary' onClick={this.handleSubmitSaleValue}>Save New Value</Button>
+                        <Button variant='outline-secondary' onClick={this.handleSubmitSaleValue}>Save New Sale Value</Button>
+                    </InputGroup.Append>
+                </InputGroup>
+            </span>
+        );
+
+        const sireValueEditField = (
+            <span onClick={this.handleInputAreaClick}>
+                <InputGroup inline="true" size="sm" as="span">
+                    <FormControl
+                        placeholder="New Sire Value"
+                        aria-label="New Sire Value"
+                        area-describedby="basic-addon2"
+                        type='number'
+                        value={this.state.newSireValue}
+                        onChange={this.updateSireValue}
+                        className="input-sm"
+                    />
+                    <InputGroup.Append>
+                        <Button variant='outline-secondary' onClick={this.handleSubmitSireValue}>Save New Sire Value</Button>
                     </InputGroup.Append>
                 </InputGroup>
             </span>
@@ -126,10 +158,14 @@ export class AccountDragonRow extends Component {
                     Public: {this.state.isPublic ? 'Yes' : 'No'} |&nbsp;
                 </span>
                 <span className='input-field' onClick={this.handleSaleValueClick}>
-                    Value: {this.state.saleValue} Crowns
+                    Sale Value: {this.state.saleValue} Crowns |&nbsp;
+                </span>
+                <span className='input-field' onClick={this.handleSireValueClick}>
+                    Sire Value: {this.state.sireValue} Crowns
                 </span>
                 {this.state.edit && nameEditField} 
                 {this.state.editSaleValue && saleValueEditField}
+                {this.state.editSireValue && sireValueEditField}
             </div>
         )
     }

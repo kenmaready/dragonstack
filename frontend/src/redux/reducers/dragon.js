@@ -9,24 +9,27 @@ const DEFAULT_DRAGON = {
     traits: [],
     isPublic: false,
     saleValue: null,
+    sireValue: null,
     loading: false,
-    message: {}
+    message: {},
+    error: ''
 };
 
 const dragonReducer = (state=DEFAULT_DRAGON, action) => {
     switch (action.type) {
         case DRAGON.FETCH:
-            return { ...state, loading: true};
+            return { ...state, loading: true, error: ''};
         case DRAGON.FETCH_ERROR:
             return {
-                ...state, loading: false, message: action.payload,
+                ...state, loading: false, error: action.payload,
             };
         case DRAGON.FETCH_SUCCESS:
             return {
                 ...action.payload,
                 birthdate: moment(action.payload.birthdate),
                 loading: false,
-                message: {}
+                message: {},
+                error: ''
             };
         default:
             return state;

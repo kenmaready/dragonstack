@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import PublicDragonRow from './PublicDragonRow';
-import { fetchPublicDragons } from '../redux/actions';
+import { fetchPublicDragons, fetchAccountDragons } from '../redux/actions';
 
 export class PublicDragons extends Component {
     componentDidMount() {
         this.props.fetchPublicDragons();
+        this.props.fetchAccountDragons();
     }
 
     render() {
@@ -44,11 +45,12 @@ export class PublicDragons extends Component {
 
 PublicDragons.proptypes = {
     dragons: PropTypes.array.isRequired,
-    fetchPublicDragons: PropTypes.func.isRequired
+    fetchPublicDragons: PropTypes.func.isRequired,
+    fetchAccountDragons: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
     dragons: state.publicDragons.dragons
 });
 
-export default connect(mapStateToProps, { fetchPublicDragons })(PublicDragons);
+export default connect(mapStateToProps, { fetchPublicDragons, fetchAccountDragons })(PublicDragons);

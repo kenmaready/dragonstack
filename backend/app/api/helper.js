@@ -36,7 +36,7 @@ const setSessionCookie = ({ sessionString, res }) => {
     })
 }
 
-const authenticatedAccount = ({ sessionString }) => {;
+const authenticatedAccount = ({ sessionString }) => {
     return new Promise((resolve, reject) => {
         if (sessionString && Session.verify(sessionString)) {
             const { username, id } = Session.parse(sessionString);
